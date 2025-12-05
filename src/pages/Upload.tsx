@@ -269,6 +269,7 @@ const Upload = () => {
                   </>
                 )}
               </Button>
+              <Button onClick={handleUpload}>Upload</Button>
             </motion.div>
           </GlassCard>
         </motion.div>
