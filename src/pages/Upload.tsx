@@ -1,3 +1,5 @@
+import { analyzeResume } from "../api";
+import { analyzeResume, saveForm } from "../api";
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,6 +30,35 @@ const Upload = () => {
     e.preventDefault();
     setIsDragging(false);
   }, []);
+  const handleUpload = async () => {
+  if (!file) {
+    alert("Please upload a file first");
+    return;
+  }
+
+  setIsAnalyzing(true);
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(${import.meta.env.VITE_BACKEND_URL}/upload, {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log("Upload result:", result);
+
+    // Optionally go to next screen
+    setCurrentStep(2);
+  } catch (error) {
+    console.error("Upload error:", error);
+    alert("Upload failed");
+  }
+
+  setIsAnalyzing(false);
+};
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
