@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Bot, User, Mic, MicOff, Send, Clock, 
-  Play, Building2, ChevronRight
+import {
+  Bot,
+  User,
+  Mic,
+  MicOff,
+  Send,
+  Clock,
+  Play,
+  Building2,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FloatingElements } from "@/components/FloatingElements";
@@ -50,20 +57,64 @@ const Interview = () => {
   const [timer, setTimer] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
 
+  // 🎤 NEW — Speech Recognition instance
+  const [recognition, setRecognition] = useState<any>(null);
+
+  // 🎤 Initialize mic recognition logic
+  useEffect(() => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      console.warn("Speech Recognition not supported");
+      return;
+    }
+
+    const recog = new SpeechRecognition();
+    recog.continuous = true;
+    recog.interimResults = false;
+    recog.lang = "en-US";
+
+    recog.onresult = (event: any) => {
+      const transcript =
+        event.results[event.resultIndex][0].transcript.trim();
+      console.log("User said:", transcript);
+      setInputValue(transcript);
+    };
+
+    recog.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+    };
+
+    recog.onend = () => {
+      if (isMicActive) {
+        recog.start(); // Auto-restart while mic is active
+      }
+    };
+
+    setRecognition(recog);
+  }, [isMicActive]);
+
   const startInterview = () => {
     setIsStarted(true);
-    // Add initial AI message
+
     setTimeout(() => {
       setMessages([
         {
           id: 1,
           type: "ai",
-          content: `Welcome! I'm your AI interviewer${selectedCompany ? ` from ${companies.find(c => c.id === selectedCompany)?.name}` : ""}. Let's begin with a ${selectedDifficulty} level interview. ${sampleQuestions[0]}`,
+          content: `Welcome! I'm your AI interviewer${
+            selectedCompany
+              ? ` from ${companies.find((c) => c.id === selectedCompany)?.name}`
+              : ""
+          }. Let's begin with a ${selectedDifficulty} level interview. ${
+            sampleQuestions[0]
+          }`,
         },
       ]);
     }, 500);
 
-    // Start timer
     const interval = setInterval(() => {
       setTimer((prev) => prev + 1);
     }, 1000);
@@ -84,29 +135,28 @@ const Interview = () => {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       setIsTyping(false);
       const nextIndex = questionIndex + 1;
-      
+
       if (nextIndex < sampleQuestions.length) {
         setMessages((prev) => [
           ...prev,
           {
             id: prev.length + 1,
             type: "ai",
-            content: `Great answer! ${sampleQuestions[nextIndex]}`,
+            content: Great answer! ${sampleQuestions[nextIndex]},
           },
         ]);
         setQuestionIndex(nextIndex);
       } else {
-        // End interview
         setMessages((prev) => [
           ...prev,
           {
             id: prev.length + 1,
             type: "ai",
-            content: "Thank you for completing the interview! Let me analyze your responses and provide feedback.",
+            content:
+              "Thank you for completing the interview! Let me analyze your responses and provide feedback.",
           },
         ]);
         setTimeout(() => {
@@ -119,17 +169,19 @@ const Interview = () => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
     <div className="min-h-screen animated-gradient pt-24 pb-12 px-4">
       <FloatingElements />
-      
+
       <div className="container mx-auto max-w-4xl relative z-10">
         <AnimatePresence mode="wait">
           {!isStarted ? (
-            /* Setup Screen */
+            /* ------------------- SETUP SCREEN ------------------- */
             <motion.div
               key="setup"
               initial={{ opacity: 0, y: 20 }}
@@ -138,58 +190,33 @@ const Interview = () => {
             >
               <div className="text-center mb-8">
                 <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">
-                  AI Interview <span className="gradient-text-accent">Simulator</span>
+                  AI Interview{" "}
+                  <span className="gradient-text-accent">Simulator</span>
                 </h1>
                 <p className="text-muted-foreground">
                   Practice with realistic AI-powered mock interviews
                 </p>
               </div>
 
-              {/* AI Avatar */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="flex justify-center mb-8"
-              >
-                <div className="relative">
-                  <motion.div
-                    animate={{
-                      y: [0, -10, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="p-6 rounded-3xl glass-card border border-secondary/30 shadow-[0_0_40px_hsl(var(--secondary)/0.3)]"
-                  >
-                    <Bot className="w-16 h-16 text-secondary" />
-                  </motion.div>
-                  {/* Pulse rings */}
-                  <div className="absolute inset-0 animate-ping rounded-3xl bg-secondary/20 opacity-75" style={{ animationDuration: "2s" }} />
-                </div>
-              </motion.div>
-
-              {/* Difficulty Selection */}
+              {/* Difficulty */}
               <GlassCard className="mb-6">
-                <h3 className="font-display font-semibold mb-4">Select Difficulty</h3>
+                <h3 className="font-display font-semibold mb-4">
+                  Select Difficulty
+                </h3>
                 <div className="flex flex-wrap gap-3">
                   {difficulties.map((diff) => (
                     <button
                       key={diff.id}
                       onClick={() => setSelectedDifficulty(diff.id)}
-                      className={`
-                        px-6 py-3 rounded-lg font-medium transition-all duration-300
-                        ${selectedDifficulty === diff.id
+                      className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+                        selectedDifficulty === diff.id
                           ? diff.color === "success"
                             ? "bg-success/20 text-success border border-success/50 shadow-[0_0_15px_hsl(var(--success)/0.3)]"
                             : diff.color === "warning"
                             ? "bg-warning/20 text-warning border border-warning/50 shadow-[0_0_15px_hsl(var(--warning)/0.3)]"
                             : "bg-destructive/20 text-destructive border border-destructive/50 shadow-[0_0_15px_hsl(var(--destructive)/0.3)]"
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }
-                      `}
+                      }`}
                     >
                       {diff.label}
                     </button>
@@ -197,21 +224,25 @@ const Interview = () => {
                 </div>
               </GlassCard>
 
-              {/* Company Selection */}
+              {/* Company */}
               <GlassCard className="mb-8">
-                <h3 className="font-display font-semibold mb-4">Company-Specific Interview (Optional)</h3>
+                <h3 className="font-display font-semibold mb-4">
+                  Company-Specific Interview (Optional)
+                </h3>
                 <div className="flex flex-wrap gap-3">
                   {companies.map((company) => (
                     <button
                       key={company.id}
-                      onClick={() => setSelectedCompany(selectedCompany === company.id ? null : company.id)}
-                      className={`
-                        flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300
-                        ${selectedCompany === company.id
+                      onClick={() =>
+                        setSelectedCompany(
+                          selectedCompany === company.id ? null : company.id
+                        )
+                      }
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                        selectedCompany === company.id
                           ? "bg-primary/20 text-primary border border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)]"
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }
-                      `}
+                      }`}
                     >
                       <span className="text-lg">{company.logo}</span>
                       {company.name}
@@ -220,7 +251,6 @@ const Interview = () => {
                 </div>
               </GlassCard>
 
-              {/* Start Button */}
               <div className="flex justify-center">
                 <Button variant="glow" size="xl" onClick={startInterview}>
                   <Play className="w-5 h-5" />
@@ -230,7 +260,7 @@ const Interview = () => {
               </div>
             </motion.div>
           ) : (
-            /* Interview Screen */
+            /* ------------------- INTERVIEW SCREEN ------------------- */
             <motion.div
               key="interview"
               initial={{ opacity: 0, y: 20 }}
@@ -245,19 +275,29 @@ const Interview = () => {
                     <Bot className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">AI Interviewer</p>
+                    <p className="font-semibold text-foreground">
+                      AI Interviewer
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {selectedCompany ? companies.find(c => c.id === selectedCompany)?.name : "General"} • {selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)}
+                      {selectedCompany
+                        ? companies.find((c) => c.id === selectedCompany)?.name
+                        : "General"}{" "}
+                      •{" "}
+                      {selectedDifficulty.charAt(0).toUpperCase() +
+                        selectedDifficulty.slice(1)}
                     </p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted border border-border">
                   <Clock className="w-4 h-4 text-primary" />
-                  <span className="font-mono text-sm text-foreground">{formatTime(timer)}</span>
+                  <span className="font-mono text-sm text-foreground">
+                    {formatTime(timer)}
+                  </span>
                 </div>
               </div>
 
-              {/* Chat Container */}
+              {/* Chat */}
               <GlassCard className="h-[calc(100%-180px)] flex flex-col p-4">
                 <div className="flex-1 overflow-y-auto scrollbar-thin space-y-4 mb-4">
                   {messages.map((message) => (
@@ -265,34 +305,35 @@ const Interview = () => {
                       key={message.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`flex gap-3 ${message.type === "user" ? "flex-row-reverse" : ""}`}
+                      className={`flex gap-3 ${
+                        message.type === "user" ? "flex-row-reverse" : ""
+                      }`}
                     >
-                      <div className={`
-                        p-2 rounded-full shrink-0
-                        ${message.type === "ai" 
-                          ? "bg-secondary/20 border border-secondary/30" 
-                          : "bg-primary/20 border border-primary/30"
-                        }
-                      `}>
+                      <div
+                        className={`p-2 rounded-full shrink-0 ${
+                          message.type === "ai"
+                            ? "bg-secondary/20 border border-secondary/30"
+                            : "bg-primary/20 border border-primary/30"
+                        }`}
+                      >
                         {message.type === "ai" ? (
                           <Bot className="w-5 h-5 text-secondary" />
                         ) : (
                           <User className="w-5 h-5 text-primary" />
                         )}
                       </div>
-                      <div className={`
-                        max-w-[80%] p-4 rounded-2xl
-                        ${message.type === "ai" 
-                          ? "chat-bubble-ai" 
-                          : "chat-bubble-user text-primary-foreground"
-                        }
-                      `}>
+                      <div
+                        className={`max-w-[80%] p-4 rounded-2xl ${
+                          message.type === "ai"
+                            ? "chat-bubble-ai"
+                            : "chat-bubble-user text-primary-foreground"
+                        }`}
+                      >
                         <p className="text-sm">{message.content}</p>
                       </div>
                     </motion.div>
                   ))}
-                  
-                  {/* Typing Indicator */}
+
                   {isTyping && (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -309,7 +350,7 @@ const Interview = () => {
                   )}
                 </div>
 
-                {/* Waveform Display */}
+                {/* Waveform when mic active */}
                 {isMicActive && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -317,24 +358,35 @@ const Interview = () => {
                     className="mb-4 p-4 rounded-lg bg-muted/50 border border-primary/30"
                   >
                     <AudioWaveform isActive={isMicActive} />
-                    <p className="text-center text-xs text-muted-foreground mt-2">Listening...</p>
+                    <p className="text-center text-xs text-muted-foreground mt-2">
+                      Listening...
+                    </p>
                   </motion.div>
                 )}
 
-                {/* Input Area */}
+                {/* Input */}
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setIsMicActive(!isMicActive)}
-                    className={`
-                      p-3 rounded-xl transition-all duration-300
-                      ${isMicActive
+                    onClick={() => {
+                      const newState = !isMicActive;
+                      setIsMicActive(newState);
+
+                      if (newState) recognition?.start();
+                      else recognition?.stop();
+                    }}
+                    className={`p-3 rounded-xl transition-all duration-300 ${
+                      isMicActive
                         ? "bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.5)] pulse-glow"
                         : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }
-                    `}
+                    }`}
                   >
-                    {isMicActive ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+                    {isMicActive ? (
+                      <Mic className="w-5 h-5" />
+                    ) : (
+                      <MicOff className="w-5 h-5" />
+                    )}
                   </button>
+
                   <input
                     type="text"
                     value={inputValue}
@@ -343,9 +395,10 @@ const Interview = () => {
                     placeholder="Type your response..."
                     className="flex-1 px-4 py-3 rounded-xl bg-muted border border-border focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground"
                   />
-                  <Button 
-                    variant="glow" 
-                    size="icon" 
+
+                  <Button
+                    variant="glow"
+                    size="icon"
                     onClick={sendMessage}
                     disabled={!inputValue.trim()}
                     className="w-12 h-12"
