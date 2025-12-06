@@ -143,7 +143,7 @@ const Interview = () => {
           {
             id: prev.length + 1,
             type: "ai",
-            content: Great answer! ${sampleQuestions[nextIndex]},
+            content: `Great answer! ${sampleQuestions[nextIndex]}`,
           },
         ]);
         setQuestionIndex(nextIndex);
