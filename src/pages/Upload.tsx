@@ -29,7 +29,7 @@ const Upload = () => {
     setIsDragging(false);
   }, []);
 
-  // ✅ FIXED UPLOAD FUNCTION WITH CORRECT TEMPLATE LITERAL
+  // ✅ FIXED — correct template literal
   const handleUpload = async () => {
     if (!file) {
       alert("Please upload a file first");
@@ -42,11 +42,13 @@ const Upload = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // ✅ FIXED — this line was breaking Netlify
-      const response = await fetch(${import.meta.env.VITE_BACKEND_URL}/upload, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        ${import.meta.env.VITE_BACKEND_URL}/upload,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const result = await response.json();
       console.log("Upload result:", result);
@@ -67,8 +69,7 @@ const Upload = () => {
     if (
       droppedFile &&
       (droppedFile.type === "application/pdf" ||
-        droppedFile.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+        droppedFile.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     ) {
       setFile(droppedFile);
     }
@@ -106,7 +107,7 @@ const Upload = () => {
       <FloatingElements />
 
       <div className="container mx-auto max-w-3xl relative z-10">
-        
+
         {/* Stepper */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -118,18 +119,12 @@ const Upload = () => {
               <div key={step.id} className="flex items-center">
                 <div className="flex items-center gap-2">
                   <motion.div
-                    animate={{
-                      scale: currentStep === step.id ? 1.1 : 1,
-                    }}
-                    className={`
-                      w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm
-                      transition-all duration-300
-                      ${
-                        currentStep >= step.id
-                          ? "bg-gradient-to-r from-primary to-[hsl(186,100%,50%)] text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
-                          : "bg-muted text-muted-foreground"
-                      }
-                    `}
+                    animate={{ scale: currentStep === step.id ? 1.1 : 1 }}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-sm transition-all duration-300 ${
+                      currentStep >= step.id
+                        ? "bg-gradient-to-r from-primary to-[hsl(186,100%,50%)] text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
+                        : "bg-muted text-muted-foreground"
+                    }`}
                   >
                     {currentStep > step.id ? (
                       <CheckCircle className="w-5 h-5" />
@@ -137,22 +132,17 @@ const Upload = () => {
                       step.id
                     )}
                   </motion.div>
-                  <span
-                    className={`hidden sm:block text-sm font-medium ${
-                      currentStep >= step.id
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                    }`}
-                  >
+                  <span className={`hidden sm:block text-sm font-medium ${
+                    currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
+                  }`}>
                     {step.label}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`
-                      w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 transition-colors duration-300
-                      ${currentStep > step.id ? "bg-primary" : "bg-muted"}
-                    `}
+                    className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 transition-colors duration-300 ${
+                      currentStep > step.id ? "bg-primary" : "bg-muted"
+                    }`}
                   />
                 )}
               </div>
@@ -171,9 +161,7 @@ const Upload = () => {
               <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
                 Upload Your <span className="gradient-text">Resume</span>
               </h1>
-              <p className="text-muted-foreground">
-                Drag and drop your resume or click to browse
-              </p>
+              <p className="text-muted-foreground">Drag and drop your resume or click to browse</p>
             </div>
 
             {/* Drop Zone */}
@@ -182,18 +170,12 @@ const Upload = () => {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               animate={{
-                borderColor: isDragging
-                  ? "hsl(var(--primary))"
-                  : "hsl(var(--border))",
-                backgroundColor: isDragging
-                  ? "hsl(var(--primary) / 0.1)"
-                  : "transparent",
+                borderColor: isDragging ? "hsl(var(--primary))" : "hsl(var(--border))",
+                backgroundColor: isDragging ? "hsl(var(--primary) / 0.1)" : "transparent",
               }}
-              className={`
-                relative border-2 border-dashed rounded-xl p-12
-                transition-all duration-300 cursor-pointer
-                ${isDragging ? "neon-border" : "border-border hover:border-primary/50"}
-              `}
+              className={`relative border-2 border-dashed rounded-xl p-12 transition-all duration-300 cursor-pointer ${
+                isDragging ? "neon-border" : "border-border hover:border-primary/50"
+              }`}
             >
               <input
                 type="file"
@@ -214,21 +196,13 @@ const Upload = () => {
                   >
                     <motion.div
                       animate={{ y: [0, -8, 0] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                       className="p-4 rounded-full bg-primary/10 border border-primary/30 mb-4"
                     >
                       <UploadIcon className="w-8 h-8 text-primary" />
                     </motion.div>
-                    <p className="text-foreground font-medium mb-2">
-                      Drop your resume here
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Supports PDF, DOCX (Max 10MB)
-                    </p>
+                    <p className="text-foreground font-medium mb-2">Drop your resume here</p>
+                    <p className="text-sm text-muted-foreground">Supports PDF, DOCX (Max 10MB)</p>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -269,12 +243,7 @@ const Upload = () => {
               animate={{ opacity: file ? 1 : 0.5 }}
               className="mt-8 flex justify-center gap-4"
             >
-              <Button
-                variant="glow"
-                size="xl"
-                onClick={handleAnalyze}
-                disabled={!file || isAnalyzing}
-              >
+              <Button variant="glow" size="xl" onClick={handleAnalyze} disabled={!file || isAnalyzing}>
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -294,56 +263,6 @@ const Upload = () => {
             </motion.div>
           </GlassCard>
         </motion.div>
-
-        {/* Analyzing Animation */}
-        <AnimatePresence>
-          {isAnalyzing && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mt-8"
-            >
-              <GlassCard hover={false} className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-6 h-6 rounded-full bg-primary/20" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">
-                      AI is analyzing your resume...
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      This may take a few seconds
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  {[
-                    "Extracting text...",
-                    "Analyzing keywords...",
-                    "Calculating ATS score...",
-                  ].map((text, i) => (
-                    <motion.div
-                      key={text}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.8 }}
-                      className="flex items-center gap-2 text-sm text-muted-foreground"
-                    >
-                      <CheckCircle className="w-4 h-4 text-success" />
-                      {text}
-                    </motion.div>
-                  ))}
-                </div>
-              </GlassCard>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );
