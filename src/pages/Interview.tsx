@@ -9,7 +9,6 @@ import {
   Send,
   Clock,
   Play,
-  Building2,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,10 +56,9 @@ const Interview = () => {
   const [timer, setTimer] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
 
-  // 🎤 NEW — Speech Recognition instance
+  // Speech Recognition instance
   const [recognition, setRecognition] = useState<any>(null);
 
-  // 🎤 Initialize mic recognition logic
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
@@ -89,7 +87,7 @@ const Interview = () => {
 
     recog.onend = () => {
       if (isMicActive) {
-        recog.start(); // Auto-restart while mic is active
+        recog.start();
       }
     };
 
@@ -159,9 +157,7 @@ const Interview = () => {
               "Thank you for completing the interview! Let me analyze your responses and provide feedback.",
           },
         ]);
-        setTimeout(() => {
-          navigate("/feedback");
-        }, 2000);
+        setTimeout(() => navigate("/feedback"), 2000);
       }
     }, 2000);
   };
@@ -190,8 +186,7 @@ const Interview = () => {
             >
               <div className="text-center mb-8">
                 <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">
-                  AI Interview{" "}
-                  <span className="gradient-text-accent">Simulator</span>
+                  AI Interview <span className="gradient-text-accent">Simulator</span>
                 </h1>
                 <p className="text-muted-foreground">
                   Practice with realistic AI-powered mock interviews
@@ -275,9 +270,7 @@ const Interview = () => {
                     <Bot className="w-5 h-5 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">
-                      AI Interviewer
-                    </p>
+                    <p className="font-semibold text-foreground">AI Interviewer</p>
                     <p className="text-xs text-muted-foreground">
                       {selectedCompany
                         ? companies.find((c) => c.id === selectedCompany)?.name
@@ -350,11 +343,11 @@ const Interview = () => {
                   )}
                 </div>
 
-                {/* Waveform when mic active */}
+                {/* Mic Waveform */}
                 {isMicActive && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     className="mb-4 p-4 rounded-lg bg-muted/50 border border-primary/30"
                   >
                     <AudioWaveform isActive={isMicActive} />
@@ -370,7 +363,6 @@ const Interview = () => {
                     onClick={() => {
                       const newState = !isMicActive;
                       setIsMicActive(newState);
-
                       if (newState) recognition?.start();
                       else recognition?.stop();
                     }}
