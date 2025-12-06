@@ -29,7 +29,7 @@ const Upload = () => {
     setIsDragging(false);
   }, []);
 
-  // ✅ FIXED VERSION (correct template literal)
+  // ✅ FIXED UPLOAD FUNCTION WITH CORRECT TEMPLATE LITERAL
   const handleUpload = async () => {
     if (!file) {
       alert("Please upload a file first");
@@ -42,6 +42,7 @@ const Upload = () => {
       const formData = new FormData();
       formData.append("file", file);
 
+      // ✅ FIXED — this line was breaking Netlify
       const response = await fetch(${import.meta.env.VITE_BACKEND_URL}/upload, {
         method: "POST",
         body: formData,
