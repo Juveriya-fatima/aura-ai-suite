@@ -44,12 +44,12 @@ const Upload = () => {
 
       // <<< THIS LINE MUST BE EXACTLY LIKE THIS (backticks)
       const response = await fetch(
-        ${import.meta.env.VITE_BACKEND_URL}/upload,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  `${import.meta.env.VITE_BACKEND_URL}/upload`,
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 
       const result = await response.json();
       console.log("Upload result:", result);
