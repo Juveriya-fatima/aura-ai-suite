@@ -42,6 +42,7 @@ const Upload = () => {
       const formData = new FormData();
       formData.append("file", file);
 
+      // <<< THIS LINE MUST BE EXACTLY LIKE THIS (backticks)
       const response = await fetch(
         ${import.meta.env.VITE_BACKEND_URL}/upload,
         {
@@ -126,24 +127,18 @@ const Upload = () => {
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    {currentStep > step.id ? (
-                      <CheckCircle className="w-5 h-5" />
-                    ) : (
-                      step.id
-                    )}
+                    {currentStep > step.id ? <CheckCircle className="w-5 h-5" /> : step.id}
                   </motion.div>
                   <span className={`hidden sm:block text-sm font-medium ${
-                    currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
-                  }`}>
+                      currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
+                    }`}>
                     {step.label}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
-                  <div
-                    className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 transition-colors duration-300 ${
+                  <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 transition-colors duration-300 ${
                       currentStep > step.id ? "bg-primary" : "bg-muted"
-                    }`}
-                  />
+                    }`} />
                 )}
               </div>
             ))}
@@ -151,11 +146,7 @@ const Upload = () => {
         </motion.div>
 
         {/* Upload Area */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <GlassCard glow="primary" hover={false} className="p-8">
             <div className="text-center mb-8">
               <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
@@ -177,58 +168,27 @@ const Upload = () => {
                 isDragging ? "neon-border" : "border-border hover:border-primary/50"
               }`}
             >
-              <input
-                type="file"
-                accept=".pdf,.docx"
-                onChange={handleFileSelect}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                disabled={isAnalyzing}
-              />
+              <input type="file" accept=".pdf,.docx" onChange={handleFileSelect}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled={isAnalyzing} />
 
               <AnimatePresence mode="wait">
                 {!file ? (
-                  <motion.div
-                    key="upload"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-col items-center"
-                  >
-                    <motion.div
-                      animate={{ y: [0, -8, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="p-4 rounded-full bg-primary/10 border border-primary/30 mb-4"
-                    >
+                  <motion.div key="upload" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
+                    <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="p-4 rounded-full bg-primary/10 border border-primary/30 mb-4">
                       <UploadIcon className="w-8 h-8 text-primary" />
                     </motion.div>
                     <p className="text-foreground font-medium mb-2">Drop your resume here</p>
                     <p className="text-sm text-muted-foreground">Supports PDF, DOCX (Max 10MB)</p>
                   </motion.div>
                 ) : (
-                  <motion.div
-                    key="file"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="flex items-center justify-center gap-4"
-                  >
-                    <div className="p-3 rounded-xl bg-success/10 border border-success/30">
-                      <FileText className="w-8 h-8 text-success" />
-                    </div>
+                  <motion.div key="file" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex items-center justify-center gap-4">
+                    <div className="p-3 rounded-xl bg-success/10 border border-success/30"><FileText className="w-8 h-8 text-success" /></div>
                     <div className="text-left">
                       <p className="font-medium text-foreground">{file.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
+                      <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
                     {!isAnalyzing && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeFile();
-                        }}
-                        className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                      >
+                      <button onClick={(e) => { e.stopPropagation(); removeFile(); }} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
                         <X className="w-5 h-5" />
                       </button>
                     )}
@@ -238,28 +198,12 @@ const Upload = () => {
             </motion.div>
 
             {/* Analyze + Upload Buttons */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: file ? 1 : 0.5 }}
-              className="mt-8 flex justify-center gap-4"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: file ? 1 : 0.5 }} className="mt-8 flex justify-center gap-4">
               <Button variant="glow" size="xl" onClick={handleAnalyze} disabled={!file || isAnalyzing}>
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    Analyze Resume
-                  </>
-                )}
+                {isAnalyzing ? (<><Loader2 className="w-5 h-5 animate-spin" />Analyzing...</>) : (<><CheckCircle className="w-5 h-5" />Analyze Resume</>)}
               </Button>
 
-              <Button onClick={handleUpload} disabled={!file || isAnalyzing}>
-                Upload
-              </Button>
+              <Button onClick={handleUpload} disabled={!file || isAnalyzing}>Upload</Button>
             </motion.div>
           </GlassCard>
         </motion.div>
